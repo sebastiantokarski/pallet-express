@@ -1,20 +1,19 @@
 import type { LocalizationResource } from '@clerk/types';
 import type { LocalePrefixMode } from 'next-intl/routing';
-import { enUS, frFR } from '@clerk/localizations';
+import { enUS, plPL } from '@clerk/localizations';
 
 const localePrefix: LocalePrefixMode = 'as-needed';
 
-// FIXME: Update this configuration file based on your project information
 export const AppConfig = {
-  name: 'Nextjs Starter',
-  locales: ['en', 'fr'],
+  name: 'Pallet Express',
+  locales: ['en', 'pl'],
   defaultLocale: 'en',
   localePrefix,
 };
 
 const supportedLocales: Record<string, LocalizationResource> = {
   en: enUS,
-  fr: frFR,
+  pl: plPL,
 };
 
 export const ClerkLocalizations = {
