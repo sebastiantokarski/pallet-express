@@ -1,5 +1,11 @@
+import { Scene } from '@/components/three';
+
 const Page = () => {
-  return null;
+  return (
+    <div>
+      <Scene />
+    </div>
+  );
 };
 
 export default Page;
