@@ -4,6 +4,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { PostHogProvider } from '@/components/analytics/PostHogProvider';
 import { routing } from '@/libs/I18nRouting';
+import { ThemeProvider } from '@/theme/ThemeProvider';
 import '@/styles/global.css';
 
 export const metadata: Metadata = {
@@ -51,9 +52,11 @@ export default async function RootLayout(props: {
     <html lang={locale}>
       <body>
         <NextIntlClientProvider>
-          <PostHogProvider>
-            {props.children}
-          </PostHogProvider>
+          <ThemeProvider>
+            <PostHogProvider>
+              {props.children}
+            </PostHogProvider>
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>
