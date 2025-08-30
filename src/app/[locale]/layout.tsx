@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
+import { Box, Toolbar } from '@mui/material';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { PostHogProvider } from '@/components/analytics/PostHogProvider';
+import { Header } from '@/components/layout/Header';
+import { Sidebar } from '@/components/layout/Sidebar';
 import { routing } from '@/libs/I18nRouting';
 import { ThemeProvider } from '@/theme/ThemeProvider';
 import '@/styles/global.css';
@@ -54,7 +57,14 @@ export default async function RootLayout(props: {
         <NextIntlClientProvider>
           <ThemeProvider>
             <PostHogProvider>
-              {props.children}
+              <Box sx={{ position: 'relative', minHeight: '100vh', display: 'flex' }}>
+                <Header />
+                <Sidebar />
+                <Box flexGrow={1}>
+                  <Toolbar />
+                  {props.children}
+                </Box>
+              </Box>
             </PostHogProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
