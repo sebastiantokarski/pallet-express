@@ -1,77 +1,91 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { Grid, OrbitControls } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Bloom, EffectComposer } from '@react-three/postprocessing';
+import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
-export const Scene = () => {
-  const mountRef = useRef<HTMLDivElement>(null);
+function AnimatedBox() {
+  const lineRef = useRef<THREE.LineSegments>(null);
 
-  useEffect(() => {
-    if (!mountRef.current) {
-      return;
-    }
-
-    // Scene setup
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xF0F0F0);
-
-    // Camera setup
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      mountRef.current.clientWidth / mountRef.current.clientHeight,
-      0.1,
-      1000,
-    );
-    camera.position.z = 3;
-
-    // Renderer setup
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
-    mountRef.current.appendChild(renderer.domElement);
-
-    // Box geometry
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshNormalMaterial();
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
-
-    // Animation loop
-    let frameId: number;
-    const animate = () => {
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
-      renderer.render(scene, camera);
-      frameId = requestAnimationFrame(animate);
-    };
-    animate();
-
-    // Handle resize
-    const handleResize = () => {
-      if (!mountRef.current) {
-        return;
-      }
-      camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
-    };
-    window.addEventListener('resize', handleResize);
-
-    // Cleanup
-    return () => {
-      cancelAnimationFrame(frameId);
-      window.removeEventListener('resize', handleResize);
-      renderer.dispose();
-      geometry.dispose();
-      material.dispose();
-      mountRef.current?.removeChild(renderer.domElement);
-    };
+  const edgesGeometry = useMemo(() => {
+    const box = new THREE.BoxGeometry(2, 2, 2);
+    return new THREE.EdgesGeometry(box);
   }, []);
 
+  const lineMaterial = useMemo(
+    () => new THREE.LineBasicMaterial({ color: 'cyan' }),
+    [],
+  );
+
+  useFrame(({ clock }) => {
+    const hue = (clock.getElapsedTime() * 20) % 360;
+    lineMaterial.color.setHSL(hue / 360, 1, 0.5);
+  });
+
   return (
-    <div
-      ref={mountRef}
-      style={{ width: '100%', height: '400px', minHeight: 300 }}
-      aria-label="3d-scene"
+    <lineSegments
+      ref={lineRef}
+      geometry={edgesGeometry}
+      material={lineMaterial}
+      position={[0, 1, 0]}
     />
   );
-};
+}
+
+function AnimatedGrid() {
+  const gridRef = useRef<THREE.Mesh>(null);
+
+  useFrame(() => {
+    if (gridRef.current) {
+      gridRef.current.rotation.y += 0.00025;
+    }
+  });
+
+  return (
+    <Grid
+      ref={gridRef}
+      args={[20, 40]}
+      cellSize={0.5}
+      cellThickness={0.5}
+      cellColor="#222"
+      sectionColor="#444"
+      followCamera={false}
+      infiniteGrid={true}
+      fadeDistance={40}
+    />
+  );
+}
+
+export default function ThreeSceneR3F() {
+  return (
+    <Canvas
+      camera={{ position: [5, 5, 5], fov: 45 }}
+      style={{ width: '100%', height: '100vh', background: '#111' }}
+    >
+      <fogExp2 attach="fog" args={[0x111111, 0.04]} />
+
+      <ambientLight intensity={0.3} />
+
+      <AnimatedGrid />
+      <AnimatedBox />
+
+      <EffectComposer>
+        <Bloom
+          intensity={1.2}
+          luminanceThreshold={0.1}
+          luminanceSmoothing={0.9}
+          height={300}
+        />
+      </EffectComposer>
+
+      <OrbitControls
+        enablePan={false}
+        minDistance={4}
+        maxDistance={15}
+        maxPolarAngle={Math.PI / 2}
+      />
+    </Canvas>
+  );
+}
