@@ -10,7 +10,7 @@ function AnimatedBox() {
   const lineRef = useRef<THREE.LineSegments>(null);
 
   const edgesGeometry = useMemo(() => {
-    const box = new THREE.BoxGeometry(2, 2, 2);
+    const box = new THREE.BoxGeometry(2, 2, 8);
     return new THREE.EdgesGeometry(box);
   }, []);
 
@@ -61,7 +61,7 @@ function AnimatedGrid() {
 export default function ThreeSceneR3F() {
   return (
     <Canvas
-      camera={{ position: [5, 5, 5], fov: 45 }}
+      camera={{ position: [10, 8, 15], fov: 45 }}
       style={{ width: '100%', height: '100vh', background: '#111' }}
     >
       <fogExp2 attach="fog" args={[0x111111, 0.04]} />
@@ -82,8 +82,8 @@ export default function ThreeSceneR3F() {
 
       <OrbitControls
         enablePan={false}
-        minDistance={4}
-        maxDistance={15}
+        minDistance={6}
+        maxDistance={25}
         maxPolarAngle={Math.PI / 2}
       />
     </Canvas>
