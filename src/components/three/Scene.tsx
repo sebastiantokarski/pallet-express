@@ -7,13 +7,24 @@ import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
 function AnimatedBox() {
+  const meshRef = useRef<THREE.Mesh>(null);
   const lineRef = useRef<THREE.LineSegments>(null);
 
-  const edgesGeometry = useMemo(() => {
-    const box = new THREE.BoxGeometry(2, 2, 8);
-    return new THREE.EdgesGeometry(box);
-  }, []);
+  const boxGeometry = useMemo(() => new THREE.BoxGeometry(2, 2, 8), []);
 
+  const material = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: new THREE.Color('cyan'),
+        metalness: 0.2,
+        roughness: 0.4,
+        transparent: true,
+        opacity: 0.35,
+      }),
+    [],
+  );
+
+  const edgesGeometry = useMemo(() => new THREE.EdgesGeometry(boxGeometry), [boxGeometry]);
   const lineMaterial = useMemo(
     () => new THREE.LineBasicMaterial({ color: 'cyan' }),
     [],
@@ -21,16 +32,15 @@ function AnimatedBox() {
 
   useFrame(({ clock }) => {
     const hue = (clock.getElapsedTime() * 20) % 360;
+    material.color.setHSL(hue / 360, 1, 0.5);
     lineMaterial.color.setHSL(hue / 360, 1, 0.5);
   });
 
   return (
-    <lineSegments
-      ref={lineRef}
-      geometry={edgesGeometry}
-      material={lineMaterial}
-      position={[0, 1, 0]}
-    />
+    <group position={[0, 1, 0]}>
+      <mesh ref={meshRef} geometry={boxGeometry} material={material} />
+      <lineSegments ref={lineRef} geometry={edgesGeometry} material={lineMaterial} />
+    </group>
   );
 }
 
