@@ -31,7 +31,7 @@ function AnimatedBox() {
   );
 
   useFrame(({ clock }) => {
-    const hue = (clock.getElapsedTime() * 20) % 360;
+    const hue = (clock.getElapsedTime() * 5) % 360;
     material.color.setHSL(hue / 360, 1, 0.5);
     lineMaterial.color.setHSL(hue / 360, 1, 0.5);
   });
