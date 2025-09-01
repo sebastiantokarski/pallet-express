@@ -1,5 +1,5 @@
 'use client';
-import { Box, useTheme } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { Grid, OrbitControls, useGLTF } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
@@ -46,37 +46,71 @@ type ScaleBarProps = {
 
 function ScaleBar({ meters, pixels }: ScaleBarProps) {
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         position: 'absolute',
         bottom: '20px',
         left: '20px',
-        color: '#0ff',
-        fontFamily: 'sans-serif',
-        fontSize: '12px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
         pointerEvents: 'none',
       }}
     >
-      <div
-        style={{
-          width: pixels,
-          height: '4px',
-          background: '#0ff',
-          boxShadow: '0 0 8px rgba(0,255,255,0.6)',
-          borderRadius: '2px',
-          marginBottom: '4px',
-          transition: 'width 0.2s ease',
+      <Box
+        sx={{
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          width: `${pixels}px`,
+          height: 10,
         }}
-      />
-      <span>
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            left: 0,
+            bottom: 0,
+            width: 2,
+            height: 10,
+            bgcolor: 'cyan',
+            boxShadow: '0 0 6px rgba(0,255,255,0.8)',
+          }}
+        />
+        <Box
+          sx={{
+            flex: 1,
+            height: 2,
+            bgcolor: 'cyan',
+            boxShadow: '0 0 6px rgba(0,255,255,0.8)',
+          }}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            right: 0,
+            bottom: 0,
+            width: 2,
+            height: 10,
+            bgcolor: 'cyan',
+            boxShadow: '0 0 6px rgba(0,255,255,0.8)',
+          }}
+        />
+      </Box>
+      <Typography
+        variant="caption"
+        sx={{
+          mt: 0.5,
+          color: 'cyan',
+          textShadow: '0 0 4px rgba(0,255,255,0.6)',
+          fontFamily: 'monospace',
+        }}
+      >
         {meters}
         {' '}
         m
-      </span>
-    </div>
+      </Typography>
+    </Box>
   );
 }
 
