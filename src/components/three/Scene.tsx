@@ -224,7 +224,7 @@ export default function ThreeSceneR3F() {
   const [scale, setScale] = useState({ meters: 1, pixels: 50 });
 
   return (
-    <Box sx={{ width: '100%', height: `calc(100vh - ${toolbarHeight}px)`, background: '#111', position: 'relative' }}>
+    <Box sx={{ width: '100%', height: `calc(100vh - ${toolbarHeight}px)`, background: '#292828', position: 'relative' }}>
       <Canvas
         camera={{ position: [10, 8, 15], fov: 45 }}
       >
