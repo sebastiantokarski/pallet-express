@@ -118,8 +118,8 @@ function TruckModel() {
   const gltf = useGLTF('/models/volvo_fh460.glb');
 
   const scale = 0.7;
-  const position: [number, number, number] = [0, -0.9, -3.1];
-  const rotation: [number, number, number] = [0, 0, 0];
+  const position: [number, number, number] = [0, -0.9, 3];
+  const rotation: [number, number, number] = [0, Math.PI, 0];
 
   return (
     <primitive
