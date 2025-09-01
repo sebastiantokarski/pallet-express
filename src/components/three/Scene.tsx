@@ -1,6 +1,6 @@
 'use client';
 import { Box, useTheme } from '@mui/material';
-import { Grid, OrbitControls } from '@react-three/drei';
+import { Grid, OrbitControls, useGLTF } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { useMemo, useRef, useState } from 'react';
@@ -80,6 +80,23 @@ function ScaleBar({ meters, pixels }: ScaleBarProps) {
   );
 }
 
+function TruckModel() {
+  const gltf = useGLTF('/models/volvo_fh460.glb');
+
+  const scale = 0.7;
+  const position: [number, number, number] = [0, -0.9, -3.1];
+  const rotation: [number, number, number] = [0, 0, 0];
+
+  return (
+    <primitive
+      object={gltf.scene}
+      scale={[scale, scale, scale]}
+      position={position}
+      rotation={rotation}
+    />
+  );
+}
+
 function AnimatedBox() {
   const meshRef = useRef<THREE.Mesh>(null);
   const lineRef = useRef<THREE.LineSegments>(null);
@@ -142,6 +159,30 @@ function AnimatedGrid() {
   );
 }
 
+function CreditsFooter() {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        bottom: '5px',
+        width: '100%',
+        textAlign: 'center',
+        color: '#646665',
+        fontFamily: 'sans-serif',
+        fontSize: '10px',
+        pointerEvents: 'none',
+        textShadow: '0 0 5px rgba(0,255,255,0.5)',
+      }}
+    >
+      Truck Model:
+      {' '}
+      <a href="https://sketchfab.com/3d-models/volvo-fh-460-rick-modding-dcd13ab86e1e469d9daa83d4cbca669e" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>Volvo FH 460 – Rick Modding</a>
+      {' '}
+      | CC BY 4.0
+    </div>
+  );
+}
+
 export default function ThreeSceneR3F() {
   const theme = useTheme();
   const toolbarHeight = theme.mixins.toolbar.minHeight;
@@ -156,8 +197,14 @@ export default function ThreeSceneR3F() {
         <fogExp2 attach="fog" args={[0x111111, 0.04]} />
 
         <ambientLight intensity={0.3} />
+        <directionalLight
+          position={[10, 20, 10]}
+          intensity={0.8}
+          castShadow
+        />
 
         <AnimatedGrid />
+        <TruckModel />
         <AnimatedBox />
 
         <EffectComposer>
@@ -167,6 +214,10 @@ export default function ThreeSceneR3F() {
             luminanceSmoothing={0.9}
             height={300}
           />
+        </EffectComposer>
+
+        <EffectComposer>
+          <Bloom intensity={0.6} luminanceThreshold={0.1} luminanceSmoothing={0.9} />
         </EffectComposer>
 
         <OrbitControls
@@ -179,6 +230,7 @@ export default function ThreeSceneR3F() {
 
       </Canvas>
       <ScaleBar meters={scale.meters} pixels={scale.pixels} />
+      <CreditsFooter />
     </Box>
 
   );
