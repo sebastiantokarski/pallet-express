@@ -1,9 +1,10 @@
 'use client';
-import { Box, Typography, useTheme } from '@mui/material';
+
+import { Box, Link, Typography, useTheme } from '@mui/material';
 import { Grid, OrbitControls, useGLTF } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
-import { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 
 function ScaleBarTracker({ setScale }: { setScale: (s: { meters: number; pixels: number }) => void }) {
@@ -132,12 +133,11 @@ function TruckModel() {
 }
 
 function AnimatedBox() {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const lineRef = useRef<THREE.LineSegments>(null);
+  const meshRef = useRef<THREE.Mesh | null>(null);
+  const lineRef = useRef<THREE.LineSegments | null>(null);
 
   const boxGeometry = useMemo(() => new THREE.BoxGeometry(2, 2, 8), []);
-
-  const material = useMemo(
+  const boxMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
         color: new THREE.Color('cyan'),
@@ -150,27 +150,34 @@ function AnimatedBox() {
   );
 
   const edgesGeometry = useMemo(() => new THREE.EdgesGeometry(boxGeometry), [boxGeometry]);
-  const lineMaterial = useMemo(
-    () => new THREE.LineBasicMaterial({ color: 'cyan' }),
-    [],
-  );
+  const edgeMaterial = useMemo(() => new THREE.LineBasicMaterial({ color: 'cyan' }), []);
 
   useFrame(({ clock }) => {
     const hue = (clock.getElapsedTime() * 5) % 360;
-    material.color.setHSL(hue / 360, 1, 0.5);
-    lineMaterial.color.setHSL(hue / 360, 1, 0.5);
+    boxMaterial.color.setHSL(hue / 360, 1, 0.5);
+    edgeMaterial.color.setHSL(hue / 360, 1, 0.5);
   });
+
+  // cleanup on unmount
+  useEffect(() => {
+    return () => {
+      boxGeometry.dispose();
+      edgesGeometry.dispose();
+      boxMaterial.dispose();
+      (edgeMaterial as THREE.Material).dispose();
+    };
+  }, [boxGeometry, edgesGeometry, boxMaterial, edgeMaterial]);
 
   return (
     <group position={[0, 1, 0]}>
-      <mesh ref={meshRef} geometry={boxGeometry} material={material} />
-      <lineSegments ref={lineRef} geometry={edgesGeometry} material={lineMaterial} />
+      <mesh ref={meshRef} geometry={boxGeometry} material={boxMaterial} />
+      <lineSegments ref={lineRef} geometry={edgesGeometry} material={edgeMaterial} />
     </group>
   );
 }
 
 function AnimatedGrid() {
-  const gridRef = useRef<THREE.Mesh>(null);
+  const gridRef = useRef<THREE.Mesh | null>(null);
 
   useFrame(() => {
     if (gridRef.current) {
@@ -195,25 +202,35 @@ function AnimatedGrid() {
 
 function CreditsFooter() {
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         position: 'absolute',
         bottom: '5px',
         width: '100%',
         textAlign: 'center',
-        color: '#646665',
+        color: '#7fbfff',
         fontFamily: 'sans-serif',
         fontSize: '10px',
         pointerEvents: 'none',
         textShadow: '0 0 5px rgba(0,255,255,0.5)',
       }}
     >
-      Truck Model:
-      {' '}
-      <a href="https://sketchfab.com/3d-models/volvo-fh-460-rick-modding-dcd13ab86e1e469d9daa83d4cbca669e" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>Volvo FH 460 – Rick Modding</a>
-      {' '}
-      | CC BY 4.0
-    </div>
+      <Typography fontSize="10px" component="span" sx={{ mr: 0.5 }}>
+        Truck Model:
+      </Typography>
+      <Link
+        href="https://sketchfab.com/3d-models/volvo-fh-460-rick-modding-dcd13ab86e1e469d9daa83d4cbca669e"
+        target="_blank"
+        rel="noopener noreferrer"
+        underline="hover"
+        sx={{ color: '#7fbfff', pointerEvents: 'auto' }}
+      >
+        Volvo FH 460 – Rick Modding
+      </Link>
+      <Typography fontSize="10px" component="span" sx={{ ml: 0.5 }}>
+        | CC BY 4.0
+      </Typography>
+    </Box>
   );
 }
 
@@ -224,7 +241,7 @@ export default function ThreeSceneR3F() {
   const [scale, setScale] = useState({ meters: 1, pixels: 50 });
 
   return (
-    <Box sx={{ width: '100%', height: `calc(100vh - ${toolbarHeight}px)`, background: '#292828', position: 'relative' }}>
+    <Box sx={{ width: '100%', height: `calc(100vh - ${toolbarHeight}px - 8px)`, background: '#292828', position: 'relative', overflow: 'hidden' }}>
       <Canvas
         camera={{ position: [10, 8, 15], fov: 45 }}
       >
