@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { PostHogProvider } from '@/components/analytics/PostHogProvider';
 import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { CanvasSettingsProvider } from '@/contexts/CanvasSettingsProvider';
 import { routing } from '@/libs/I18nRouting';
 import { ThemeProvider } from '@/theme/ThemeProvider';
 import '@/styles/global.css';
@@ -57,14 +58,16 @@ export default async function RootLayout(props: {
         <NextIntlClientProvider>
           <ThemeProvider>
             <PostHogProvider>
-              <Box sx={{ position: 'relative', minHeight: '100vh', display: 'flex' }}>
-                <Header />
-                <Sidebar />
-                <Box flexGrow={1}>
-                  <Toolbar />
-                  {props.children}
+              <CanvasSettingsProvider>
+                <Box sx={{ position: 'relative', minHeight: '100vh', display: 'flex' }}>
+                  <Header />
+                  <Sidebar />
+                  <Box flexGrow={1}>
+                    <Toolbar />
+                    {props.children}
+                  </Box>
                 </Box>
-              </Box>
+              </CanvasSettingsProvider>
             </PostHogProvider>
           </ThemeProvider>
         </NextIntlClientProvider>

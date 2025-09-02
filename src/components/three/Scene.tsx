@@ -6,6 +6,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { useCanvasSettings } from '@/hooks/useCanvasSettings';
 
 function ScaleBarTracker({ setScale }: { setScale: (s: { meters: number; pixels: number }) => void }) {
   const { camera, size } = useThree();
@@ -133,10 +134,15 @@ function TruckModel() {
 }
 
 function AnimatedBox() {
+  const { dimensions } = useCanvasSettings();
+
+  const scale = 0.006;
+  const [w, h, l] = [dimensions.width * scale, dimensions.height * scale, dimensions.length * scale];
+
   const meshRef = useRef<THREE.Mesh | null>(null);
   const lineRef = useRef<THREE.LineSegments | null>(null);
 
-  const boxGeometry = useMemo(() => new THREE.BoxGeometry(2, 2, 8), []);
+  const boxGeometry = useMemo(() => new THREE.BoxGeometry(w, h, l), [w, h, l]);
   const boxMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
