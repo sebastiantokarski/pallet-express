@@ -117,16 +117,23 @@ function ScaleBar({ meters, pixels }: ScaleBarProps) {
 }
 
 function TruckModel() {
+  const { trailerDimensions } = useCanvasSettings();
+
+  const scale = 0.006; // same scale used for box (cm -> world units)
+  const trailerLengthWorld = trailerDimensions.length * scale;
+  const truckOffset = -0.9;
+  const truckZ = trailerLengthWorld / 2 + truckOffset;
+
   const gltf = useGLTF('/models/volvo_fh460.glb');
 
-  const scale = 0.7;
-  const position: [number, number, number] = [0, -0.9, 3];
+  const truckScale = 0.7;
+  const position: [number, number, number] = [0, -0.9, truckZ];
   const rotation: [number, number, number] = [0, Math.PI, 0];
 
   return (
     <primitive
       object={gltf.scene}
-      scale={[scale, scale, scale]}
+      scale={[truckScale, truckScale, truckScale]}
       position={position}
       rotation={rotation}
     />
@@ -134,10 +141,10 @@ function TruckModel() {
 }
 
 function AnimatedBox() {
-  const { dimensions } = useCanvasSettings();
+  const { trailerDimensions } = useCanvasSettings();
 
   const scale = 0.006;
-  const [w, h, l] = [dimensions.width * scale, dimensions.height * scale, dimensions.length * scale];
+  const [w, h, l] = [trailerDimensions.width * scale, trailerDimensions.height * scale, trailerDimensions.length * scale];
 
   const meshRef = useRef<THREE.Mesh | null>(null);
   const lineRef = useRef<THREE.LineSegments | null>(null);
@@ -174,8 +181,11 @@ function AnimatedBox() {
     };
   }, [boxGeometry, edgesGeometry, boxMaterial, edgeMaterial]);
 
+  // Position box so its bottom sits on the grid (y = 0)
+  const boxY = h / 2;
+
   return (
-    <group position={[0, 1, 0]}>
+    <group position={[0, boxY, 0]}>
       <mesh ref={meshRef} geometry={boxGeometry} material={boxMaterial} />
       <lineSegments ref={lineRef} geometry={edgesGeometry} material={edgeMaterial} />
     </group>
@@ -248,9 +258,7 @@ export default function ThreeSceneR3F() {
 
   return (
     <Box sx={{ width: '100%', height: `calc(100vh - ${toolbarHeight}px - 8px)`, background: '#292828', position: 'relative', overflow: 'hidden' }}>
-      <Canvas
-        camera={{ position: [10, 8, 15], fov: 45 }}
-      >
+      <Canvas camera={{ position: [10, 8, 15], fov: 45 }}>
         <fogExp2 attach="fog" args={[0x111111, 0.04]} />
 
         <ambientLight intensity={0.3} />
