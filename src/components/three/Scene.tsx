@@ -1,12 +1,13 @@
 'use client';
 
 import { Box, Link, Typography, useTheme } from '@mui/material';
-import { Grid, OrbitControls, useGLTF } from '@react-three/drei';
+import { Grid, OrbitControls } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useCanvasSettings } from '@/hooks/useCanvasSettings';
+import TruckModel from '../TruckModel';
 
 function ScaleBarTracker({ setScale }: { setScale: (s: { meters: number; pixels: number }) => void }) {
   const { camera, size } = useThree();
@@ -113,30 +114,6 @@ function ScaleBar({ meters, pixels }: ScaleBarProps) {
         m
       </Typography>
     </Box>
-  );
-}
-
-function TruckModel() {
-  const { trailerDimensions } = useCanvasSettings();
-
-  const scale = 0.006; // same scale used for box (cm -> world units)
-  const trailerLengthWorld = trailerDimensions.length * scale;
-  const truckOffset = -0.9;
-  const truckZ = trailerLengthWorld / 2 + truckOffset;
-
-  const gltf = useGLTF('/models/volvo_fh460.glb');
-
-  const truckScale = 0.7;
-  const position: [number, number, number] = [0, -0.9, truckZ];
-  const rotation: [number, number, number] = [0, Math.PI, 0];
-
-  return (
-    <primitive
-      object={gltf.scene}
-      scale={[truckScale, truckScale, truckScale]}
-      position={position}
-      rotation={rotation}
-    />
   );
 }
 
@@ -252,6 +229,7 @@ function CreditsFooter() {
 
 export default function ThreeSceneR3F() {
   const theme = useTheme();
+  const { trailerDimensions } = useCanvasSettings();
   const toolbarHeight = theme.mixins.toolbar.minHeight;
 
   const [scale, setScale] = useState({ meters: 1, pixels: 50 });
@@ -269,7 +247,7 @@ export default function ThreeSceneR3F() {
         />
 
         <AnimatedGrid />
-        <TruckModel />
+        <TruckModel trailerDimensions={trailerDimensions} />
         <AnimatedBox />
 
         <EffectComposer>
